@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+import java.util.Arrays;
 public class Influence {
      private String name;
      private boolean tax;
@@ -23,9 +25,19 @@ public class Influence {
         new Influence("Assassin", false, true, false, false, false, false, false),
         new Influence("Captain", false, false, false, true, false, false, true),
         new Influence("Ambassador", false, false, false, true, false, false, true),
-        new Influence("Contessa", false, false, false, false, true, false, false)
+        new Influence("Contessa", false, false, false, false, true, false, false),
+        new Influence("Empty", false, false, false, false, false, false, false)
 
     };
+    public static ArrayList<Influence> deck = new ArrayList<Influence>() {{
+        for (int i = 0; i < 3; i++) {
+            addAll(Arrays.asList(INFLUENCES[0], INFLUENCES[1], INFLUENCES[2], INFLUENCES[3], INFLUENCES[4]));
+        }
+    }};
+
+
+
+
     public String getName() {return this.name;}
     public boolean canTax() {return this.tax;}
     public boolean canAssassinate() {return this.assassinate;}
@@ -38,3 +50,5 @@ public class Influence {
     public static Influence[] getInfluences() {return INFLUENCES;}
 
 }
+
+
