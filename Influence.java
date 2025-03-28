@@ -35,4 +35,6 @@ public class Influence {
     public boolean canBlockSteal() {return this.blockSteal;}
     public boolean canBlockAid() {return this.blockAid;}
 
+    public static Influence[] getInfluences() {return INFLUENCES;}
+
 }

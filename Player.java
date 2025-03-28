@@ -3,33 +3,21 @@ public class Player {
     private int tokens;
     private Influence influence1;
     private Influence influence2;
+    private int index;
 
 
-    public Player(String name){
+    public Player(String name, int index){
         this.name = name;
         this.tokens = 0;
         this.influence1 = Influence.INFLUENCES[(int) (Math.random()*5)];
         this.influence2 = Influence.INFLUENCES[(int) (Math.random()*5)];
+        this.index = index;
     }
-    private void addTokens(int token){
+    public void addTokens(int token){
         this.tokens += token;
     }
-    private void removeTokens(int token){
+    public void removeTokens(int token){
         this.tokens -= token;
     }
-    public void income(){
-        this.tokens++;
-    }
-    public void foreignAid(){
-        this.tokens += 2;
-    }
-    public void tax(){
-        this.tokens += 3;
-    }
-    public void steal(Player target){
-        this.tokens += 2;
-        target.removeTokens(2);
-    }
-
 
 }
