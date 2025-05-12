@@ -1,21 +1,16 @@
+import java.util.Scanner;
 public class Game {
-    private Player[] players;
-    private Deck gameDeck;
-    private String code;
 
-    public void BlockAction(int i_target, int i_challenger, String action){
-
+    public static String getInput(String toPrint){
+        Scanner scanner = new Scanner(System.in);
+        System.out.println(toPrint);
+        return scanner.nextLine();
     }
 
-    public void income(int i_player){
-        this.players[i_player].addTokens(1);
+    public static void main(String[] args){
+        int numPlayers = StringToInt.stringToInt(getInput("Number of players?"));
+        for (int i = 0; i<numPlayers; i++){
+             getInput("Name of player "+ (i+1));
+        }
     }
-    public void foreignAid(int i_player){
-        this.players[i_player].addTokens(2);
-    }
-    public void tax(int i_player){
-        this.players[i_player].addTokens(3);
-    }
-
-
 }
