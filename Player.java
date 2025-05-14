@@ -4,7 +4,7 @@ public class Player {
     private Influence influence1;
     private Influence influence2;
     private int index;
-
+    private boolean out;
 
     public Player(String name, int index){
         this.name = name;
@@ -18,6 +18,9 @@ public class Player {
     }
     public void removeTokens(int token){
         this.tokens -= token;
+    }
+    public boolean isOut(){
+        return out;
     }
 
 
