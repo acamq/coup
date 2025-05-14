@@ -32,10 +32,12 @@ public class Game {
     public void Play(){
         getPlayers();
         boolean win = false;
+        MultipleButtonsFrame ui = new MultipleButtonsFrame();
+        MultipleButtonsFrame.showUI();
         while (!win) {
-            for (int i = 0; i < players.length; i++){
+            //for (int i = 0; i < players.length; i++){
                 //takeAction();
-            }
+          //  }
             win = checkWin();
         }
     }
