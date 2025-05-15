@@ -1,4 +1,5 @@
 import java.util.Scanner;
+
 public class StringToInt {
     public static int stringToInt(String toPrint) {
         Scanner scanner = new Scanner(System.in);
@@ -9,7 +10,6 @@ public class StringToInt {
         // Using Integer.parseInt()
         try {
             num = Integer.parseInt(str);
-            //System.out.println("Integer.parseInt(): " + num);
         } catch (NumberFormatException e) {
             System.out.println("Error: Invalid string for Integer.parseInt()");
         }
@@ -17,14 +17,13 @@ public class StringToInt {
         // Using Integer.valueOf()
         try {
             num = Integer.valueOf(str);
-            //System.out.println("Integer.valueOf(): " + num);
         } catch (NumberFormatException e) {
             System.out.println("Error: Invalid string for Integer.valueOf()");
         }
 
         if (num < 0) {
             System.out.println("Error: Invalid string. Please enter an integer");
-            stringToInt(toPrint);
+            return stringToInt(toPrint); // fixed by adding return
         }
         return num;
     }
