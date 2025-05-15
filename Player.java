@@ -33,17 +33,14 @@ public class Player {
     public String getInfo(){
         return "Name: " + name + ", Tokens: " + tokens + ", # of influences: " + numInfluences();
     }
-    public void income(){
-        tokens += 1;
+    public int getTokens(){
+        return tokens;
     }
     public Influence getInfluence1(){
         return influence1;
     }
     public Influence getInfluence2(){
         return influence2;
-    }
-    public void tax(){
-        tokens += 3;
     }
 
     public String toString(){

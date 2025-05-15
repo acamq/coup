@@ -10,57 +10,107 @@ public class Game {
 
     private final String CHALLENGEREASON = ", you lost a challenge. Please choose an influence to lose.";
 
-    public void foreignAid(int player_i){
+    public boolean income(int player_i){
+        players[player_i].addTokens(1);
+        return true;
+    }
+    public boolean foreignAid(int player_i){
         boolean canAid = blockAndChallenge(player_i, "foreign aid", Influence.INFLUENCES[0]);
         if (canAid){
             players[player_i].addTokens(2);
         }
+        return true;
     }
 
-    public void coup(int player_i){
+    public boolean coup(int player_i){
+        if (players[player_i].getTokens()<7){
+            System.out.println("Not enough tokens!");
+            return false;
+        }
         players[player_i].loseInfluence(" you have been targeted by a coup.");
+        players[player_i].removeTokens(7);
+        return true;
     }
 
-    public void tax(int player_i){
+    public boolean tax(int player_i){
         boolean canTax = challengeCurrent(player_i, "tax", Influence.INFLUENCES[0]);
         if (canTax){
             players[player_i].addTokens(3);
         }
+        return true;
     }
 
-    public void assassination(int player_killer, int player_target){
-        int choice = StringToInt.stringToInt("Block (1) or challenge (2)");
-        while (!(choice == 1 || choice == 2)) {
-            choice = StringToInt.stringToInt("Invalid input. Block (1) or challenge (2)");
+    public boolean assassination(int player_killer, int player_target){
+        if (players[player_killer].getTokens()<3){
+            System.out.println("Not enough tokens!");
+            return false;
         }
-        boolean canKill = false;
-        if (choice == 1){
-            canKill = blockAndChallenge(player_killer, "assassination", Influence.INFLUENCES[4]);
+        boolean canKill = true;
+        String choice = Game.getInput("Block (1) or challenge (2)");
+        while (!(choice.equals("1") || choice.equals("2")|| choice.isEmpty())) {
+            choice = Game.getInput("Invalid input. Block (1) or challenge (2)");
         }
-        else if (choice == 2){
-            canKill = challengeCurrent(player_killer, "assassination", Influence.INFLUENCES[1]);
+        if (!choice.isEmpty()) {
+            if (choice.equals("1")) {
+                canKill = blockAndChallenge(player_killer, "assassination", Influence.INFLUENCES[4]);
+            } else if (choice.equals("2")){
+                canKill = challengeCurrent(player_killer, "assassination", Influence.INFLUENCES[1]);
+            }
         }
-        if (canKill){
+        if (canKill) {
             players[player_target].loseInfluence(", you have been targeted by an assassination.");
         }
+        players[player_killer].removeTokens(3);
+        return true;
     }
 
-    public void steal(int player_thief, int player_target){
-        String willBlock = Game.getInput("If you want to block, please declare an influence to block with.");
+    public boolean steal(int player_thief, int player_target){
+        boolean canSteal = true;
+        String willBlock = Game.getInput("If you want to block, please choose Captain or Ambassador.");
+        while (!(willBlock.equals("Captain")||willBlock.equals("Ambassador")||willBlock.isEmpty())){
+            willBlock = Game.getInput("Invalid input. Please choose Captain or Ambassador");
+        }
         if (!willBlock.isEmpty()){
             if (willBlock.equals("Captain")){
-                boolean canSteal = blockAndChallenge(player_thief, "steal", Influence.INFLUENCES[2]);
+                canSteal = blockAndChallenge(player_thief, "steal", Influence.INFLUENCES[2]);
             }
             if (willBlock.equals("Ambassador")){
-                boolean canSteal = blockAndChallenge(player_thief, "steal", Influence.INFLUENCES[3]);
+                canSteal = blockAndChallenge(player_thief, "steal", Influence.INFLUENCES[3]);
             }
         }
-        boolean canSteal; //= blockAndChallenge(player_thief, "robbery", Influence.INFLUENCES[3]);
         if (canSteal){
             players[player_thief].addTokens(2);
             players[player_target].removeTokens(2);
         }
+        return true;
     }
+
+    public boolean exchange(int player_i){
+        boolean canExchange = challengeCurrent(player_i, "exchange", Influence.INFLUENCES[3]);
+        Player exchanging = players[player_i];
+        boolean has1 = exchanging.getInfluence1().equals(null);
+        boolean has2 = exchanging.getInfluence2().equals(null);
+        Influence[] exchange;
+        if (has1&&has2){
+            exchange = new Influence[]{exchanging.getInfluence1(), exchanging.getInfluence2(), Influence.random(), Influence.random()};
+            SecretInfluenceViewer.showAmbassador(exchange);
+        }
+        else {
+            if (has1) {
+                exchange = new Influence[]{exchanging.getInfluence1(), Influence.random(), Influence.random()};
+            } else {
+                exchange = new Influence[]{exchanging.getInfluence2(), Influence.random(), Influence.random()};
+            }
+        }
+        SecretInfluenceViewer.showAmbassador(exchange);
+        String chosen = Game.getInput("Choose two influences by entering the number of the influence, a space, and another number.");
+        int chosen1 = StringToInt.convertToInt(chosen.substring(0,1));
+        int chosen2 = StringToInt.convertToInt(chosen.substring(2));
+
+        return true;
+    }
+
+
 
     public boolean blockAndChallenge(int player_i, String action, Influence influence){
         Player current = players[player_i];
