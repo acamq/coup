@@ -36,19 +36,14 @@ public class Player {
     public void income(){
         tokens += 1;
     }
-    public void foreignAid(){
-        tokens += 2;
+    public Influence getInfluence1(){
+        return influence1;
+    }
+    public Influence getInfluence2(){
+        return influence2;
     }
     public void tax(){
         tokens += 3;
-    }
-    public void blockSteal(Player victim, Player thief){
-        thief.tokens -=2;
-        victim.tokens +=2;
-    }
-    public void steal(Player target){
-        target.tokens -= 2;
-        this.tokens += 2;
     }
 
     public String toString(){
@@ -69,15 +64,15 @@ public class Player {
         return count;
     }
 
-    public void coup(Player target){
+    public void loseInfluence(String reason){
         if (influence1.equals(null) || influence2.equals(null)){
-            System.out.println(target + ", you are out!");
+            System.out.println(this.name + ", you are out!");
             influence1 = null;
             influence2 = null;
             out = true;
         }
         else{
-            int toLose = StringToInt.stringToInt(target+", you have been targeted by a Coup. Please choose which influence to lose, 1 or 2.");
+            int toLose = StringToInt.stringToInt(this.name+reason);
             boolean removed = false;
             while (!removed) {
                 if (toLose == 1) {
@@ -93,44 +88,4 @@ public class Player {
             }
         }
     }
-
-    public void blockAid(Player blocked){
-        blocked.tokens -= 2;
-    }
-
-    public void Challenge(Player target, String action){
-
-    }
-
-    public boolean canAssassinate(){
-        return tokens >= 3;
-    }
-
-    public void assassinate(Player target){
-        System.out.println(target + ", you are being assassinated. If you want to block, do it now.");
-
-        if (influence1.equals(null) || influence2.equals(null)){
-            System.out.println(target + ", you are out!");
-            influence1 = null;
-            influence2 = null;
-            out = true;
-        }
-        else{
-            int toLose = StringToInt.stringToInt(target+", you have been targeted by a assassination. Please choose which influence to lose, 1 or 2.");
-            boolean removed = false;
-            while (!removed) {
-                if (toLose == 1) {
-                    influence1 = null;
-                    removed = true;
-                } else if (toLose == 2) {
-                    influence2 = null;
-                    removed = true;
-                }
-                else{
-                    toLose = StringToInt.stringToInt("Invalid input. Please choose influence 1 or 2.");
-                }
-            }
-        }
-    }
-
 }

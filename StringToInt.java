@@ -1,6 +1,23 @@
 import java.util.Scanner;
 
 public class StringToInt {
+    public static int convertToInt(String toConvert){
+        int num = -1;
+        String str = toConvert;
+        try {
+            num = Integer.parseInt(str);
+        } catch (NumberFormatException e) {
+            System.out.println("Error: Invalid string for Integer.parseInt()");
+        }
+
+        // Using Integer.valueOf()
+        try {
+            num = Integer.valueOf(str);
+        } catch (NumberFormatException e) {
+            System.out.println("Error: Invalid string for Integer.valueOf()");
+        }
+        return num;
+    }
     public static int stringToInt(String toPrint) {
         Scanner scanner = new Scanner(System.in);
         System.out.println(toPrint);

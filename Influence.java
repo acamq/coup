@@ -87,4 +87,9 @@ public class Influence {
     public static Influence random() {
         return INFLUENCES[ThreadLocalRandom.current().nextInt(INFLUENCES.length)];
     }
+
+    public boolean equals(Influence other){
+        if (other.name.equals(this.name)) return true;
+        else return false;
+    }
 }
