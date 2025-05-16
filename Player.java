@@ -32,6 +32,12 @@ public class Player {
     }
     public String getName(){return name;}
     public String getInfo(){
+        if (isOut()){
+            return String.format(
+                    "Name: %s (Player #%d) is out.",
+                    name, playerNum
+            );
+        }
         return String.format(
                 "Name: %s (Player #%d), Tokens: %d, # of influences: %d",
                 name, playerNum, tokens, numInfluences()
@@ -74,14 +80,14 @@ public class Player {
     }
 
     public void loseInfluence(String reason){
-        if (influence1.equals(null) || influence2.equals(null)){
+        if (influence1 == null || influence2 == null){
             System.out.println(this.name + ", you are out!");
             influence1 = null;
             influence2 = null;
             out = true;
         }
         else{
-            int toLose = StringToInt.stringToInt(this.name+reason);
+            int toLose = StringToInt.stringToInt(this.name+reason+"\nPlease choose an influence to lose by inputting 1 or 2.");
             boolean removed = false;
             while (!removed) {
                 if (toLose == 1) {
