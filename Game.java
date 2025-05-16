@@ -105,8 +105,8 @@ public class Game {
         boolean canExchange = challengeCurrent(player_i, "exchange", Influence.INFLUENCES[3]);
         if (canExchange) {
             Player exchanging = players[player_i];
-            boolean has1 = !exchanging.getInfluence1().equals(null);
-            boolean has2 = !exchanging.getInfluence2().equals(null);
+            boolean has1 = !(exchanging.getInfluence1() == null);
+            boolean has2 = !(exchanging.getInfluence2() == (null));
             Influence[] exchange;
             if (has1 && has2) {
                 exchange = new Influence[]{exchanging.getInfluence1(), exchanging.getInfluence2(), Influence.random(), Influence.random()};
@@ -122,6 +122,7 @@ public class Game {
             String chosen = Game.getInput("Choose two influences by entering the number of the influence, a space, and another number.");
             int chosen1 = StringToInt.convertToInt(chosen.substring(0, 1)) - 1;
             int chosen2 = StringToInt.convertToInt(chosen.substring(2)) - 1;
+
             exchanging.setInfluence1(exchange[chosen1]);
             exchanging.setInfluence2(exchange[chosen2]);
             System.out.println("You have exchanged.");
@@ -142,7 +143,7 @@ public class Game {
             Player counter = players[blocker-1];
             String challengeBlock = Game.getInput("Challenge the block? Input anything to challenge.");
             if (!challengeBlock.isEmpty()){
-                if (counter.getInfluence1().equals(influence)||counter.getInfluence2().equals(influence)){
+                if (influence.equals(counter.getInfluence1())||influence.equals(counter.getInfluence2())){
                     System.out.println(
                             String.format("%1$s had an %2$s. %3$s, you lose the challenge and an influence.",
                                     counter, influence, current)
@@ -153,15 +154,15 @@ public class Game {
                                     current, action, counter)
                     );
                     System.out.println(
-                            String.format("%s, you will receive a random influence to replace the revealed one.",
+                            String.format("%s, you will receive a random influence to replace the revealed one.\nPlease check your tabs to see your influences.",
                                     counter)
                     );
-                    if (counter.getInfluence1().equals(influence)){
+                    if (influence.equals(counter.getInfluence1())){
                         Influence toGive = Influence.random();
                         SecretInfluenceViewer.showInfluences(new Influence[]{toGive, counter.getInfluence2()}, false);
                         counter.setInfluence1(toGive);
                     }
-                    else if (counter.getInfluence2().equals(influence)){
+                    else if (influence.equals(counter.getInfluence2())){
                         Influence toGive = Influence.random();
                         SecretInfluenceViewer.showInfluences(new Influence[]{counter.getInfluence1(), toGive}, false);
                         counter.setInfluence2(toGive);
@@ -210,22 +211,22 @@ public class Game {
                 challengePlayer = StringToInt.convertToInt("Invalid player number.");
             }
             Player challenger = players[challengePlayer-1];
-            if (current.getInfluence1().equals(influence)||current.getInfluence2().equals(influence)){
+            if (influence.equals(current.getInfluence1())||influence.equals(current.getInfluence2())){
                 System.out.println(
                         String.format("%1$s had an %2$s. %3$s, you lose the challenge and an influence.",
                                 current, influence, challenger)
                 );
                 challenger.loseInfluence(CHALLENGEREASON);
                 System.out.println(
-                        String.format("%s, you will receive a random influence to replace the revealed one.",
+                        String.format("%s, you will receive a random influence to replace the revealed one.\nPlease check your tabs to see your influences.",
                                 current)
                 );
-                if (current.getInfluence1().equals(influence)){
+                if (influence.equals(current.getInfluence1())){
                     Influence toGive = Influence.random();
                     SecretInfluenceViewer.showInfluences(new Influence[]{toGive, current.getInfluence2()}, false);
                     current.setInfluence1(toGive);
                 }
-                else if (current.getInfluence2().equals(influence)){
+                else if (influence.equals(current.getInfluence2())){
                     Influence toGive = Influence.random();
                     SecretInfluenceViewer.showInfluences(new Influence[]{current.getInfluence1(), toGive}, false);
                     current.setInfluence2(toGive);
@@ -266,7 +267,7 @@ public class Game {
         }
         SecretInfluenceViewer.show(players);
         System.out.println("Please view your influences");
-        System.out.println("Game setup complete! Please check your tabs for the game UI.");
+        System.out.println("Game setup complete! Please check your tabs to view your influences .");
     }
     public boolean checkWin(){
         int numOut = 0;

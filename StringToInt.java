@@ -32,14 +32,14 @@ public class StringToInt {
         try {
             num = Integer.parseInt(str);
         } catch (NumberFormatException e) {
-            System.out.println("Error: Invalid string for Integer.parseInt()");
+           // System.out.println("Error: Invalid string for Integer.parseInt()");
         }
 
         // Using Integer.valueOf()
         try {
             num = Integer.valueOf(str);
         } catch (NumberFormatException e) {
-            System.out.println("Error: Invalid string for Integer.valueOf()");
+            //System.out.println("Error: Invalid string for Integer.valueOf()");
         }
 
         if (num < 0) {

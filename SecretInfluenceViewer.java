@@ -38,12 +38,11 @@ public class SecretInfluenceViewer {
 
     // Constructor for in-game exchange or view display.
     private SecretInfluenceViewer(Influence[] influences, boolean isAmbassador) {
-
         this.players = null;
         this.isInGameView = true;
         this.ambassadorMode = isAmbassador;
         this.vInfluences = influences;
-        frame = new JFrame(isAmbassador ? "Ambassador Exchange Viewer" : "Influence Viewer");
+        frame = new JFrame("Influence Viewer");
         initCommonUI();
         updateUI();
         frame.setVisible(true);
@@ -76,11 +75,11 @@ public class SecretInfluenceViewer {
         if (isInGameView) {
             // In-game modes (ambassador or simple view)
             if (!showingInfluences) {
-                messageLabel.setText("Click \"View\" to see your influences.");
+                messageLabel.setText("<html>Click \"View\" to see your influences.<br>Make sure nobody else is looking!</html>");
                 actionButton.setText("View");
             } else {
                 if (ambassadorMode) {
-                    messageLabel.setText("Ambassador: view and choose exchange cards:");
+                    messageLabel.setText("<html>Ambassador: view and choose exchange cards.<br>(Make sure nobody else is looking!)</html>");
                 } else {
                     messageLabel.setText("Your Influences (keep secret!):");
                 }
@@ -99,8 +98,7 @@ public class SecretInfluenceViewer {
             // Player-reveal sequence
             Player p = players[currentPlayer];
             if (!showingInfluences) {
-                messageLabel.setText(
-                        "Pass the device to " + p.getName() + ". Click \"View\" when ready.");
+                messageLabel.setText("<html>Pass the device to " + p.getName() + ". Click \"View\" when ready.<br>Make sure nobody else is looking!</html>");
                 actionButton.setText("View");
             } else {
                 messageLabel.setText(p.getName() + "'s Influences (keep secret!):");
