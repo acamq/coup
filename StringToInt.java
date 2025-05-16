@@ -16,6 +16,10 @@ public class StringToInt {
         } catch (NumberFormatException e) {
             System.out.println("Error: Invalid string for Integer.valueOf()");
         }
+        if (num < 0){
+            System.out.println("Error: Invalid input.");
+            return stringToInt("Please enter the number again.");
+        }
         return num;
     }
     public static int stringToInt(String toPrint) {

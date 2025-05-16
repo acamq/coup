@@ -1,24 +1,25 @@
+
 public class Player {
     private String name;
     private int tokens;
     private Influence influence1;
     private Influence influence2;
-    private int index;
+    private int playerNum;
     private boolean out;
 
-    public Player(String name, int index){
+    public Player(String name, int playerNum){
         this.name = name;
         this.tokens = 2;
-        this.influence1 = Influence.INFLUENCES[(int) (Math.random()*5)];
-        this.influence2 = Influence.INFLUENCES[(int) (Math.random()*5)];
-        this.index = index;
+        this.influence1 = Influence.random();
+        this.influence2 = Influence.random();
+        this.playerNum = playerNum;
     }
-    public Player(String name, int index, int tokens){
+    public Player(String name, int playerNum, int tokens){
         this.name = name;
         this.tokens = tokens;
-        this.influence1 = Influence.INFLUENCES[(int) (Math.random()*5)];
-        this.influence2 = Influence.INFLUENCES[(int) (Math.random()*5)];
-        this.index = index;
+        this.influence1 = Influence.random();
+        this.influence2 = Influence.random();
+        this.playerNum = playerNum;
     }
     public void addTokens(int token){
         this.tokens += token;
@@ -31,7 +32,10 @@ public class Player {
     }
     public String getName(){return name;}
     public String getInfo(){
-        return "Name: " + name + ", Tokens: " + tokens + ", # of influences: " + numInfluences();
+        return String.format(
+                "Name: %s (Player #%d), Tokens: %d, # of influences: %d",
+                name, playerNum, tokens, numInfluences()
+        );
     }
     public int getTokens(){
         return tokens;
@@ -42,14 +46,22 @@ public class Player {
     public Influence getInfluence2(){
         return influence2;
     }
+    public void setInfluence1(Influence influence){
+        influence1 = influence;
+    }
+    public void setInfluence2(Influence influence){
+        influence2 = influence;
+    }
 
     public String toString(){
         return name;
     }
 
-    public boolean canCoup(){
+/*public boolean canCoup(){
         return tokens >= 7;
     }
+
+ */
 
     public boolean mustCoup(){
         return tokens >= 10;

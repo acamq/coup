@@ -6,31 +6,51 @@ import java.awt.event.ActionListener;
 /**
  * UI to sequentially show each player's hidden influences,
  * with swap-seats warnings and external invocation,
- * and to display 4 influences for Ambassador exchange.
+ * and to display influences in various in-game situations.
  */
 public class SecretInfluenceViewer {
     private final JFrame frame;
-    private final JLabel messageLabel;
-    private final JPanel influencePanel;
-    private final JButton actionButton;
+    private JLabel messageLabel;
+    private JPanel influencePanel;
+    private JButton actionButton;
 
     // For player reveal mode
     private final Player[] players;
     private int currentPlayer = 0;
     private boolean showingInfluences = false;
 
-    // For ambassador mode
+    // For in-game mode
     private final boolean ambassadorMode;
-    private final Influence[] ambassadorInfluences;
+    private final boolean isInGameView;
+    private final Influence[] vInfluences;
 
-    /**
-     * Constructor for player reveal sequence.
-     */
+    // Constructor for player-reveal sequence.
     private SecretInfluenceViewer(Player[] players) {
         this.players = players;
+        this.isInGameView = false;
         this.ambassadorMode = false;
-        this.ambassadorInfluences = null;
+        this.vInfluences = null;
         frame = new JFrame("Secret Influence Viewer");
+        initCommonUI();
+        updateUI();
+        frame.setVisible(true);
+    }
+
+    // Constructor for in-game exchange or view display.
+    private SecretInfluenceViewer(Influence[] influences, boolean isAmbassador) {
+
+        this.players = null;
+        this.isInGameView = true;
+        this.ambassadorMode = isAmbassador;
+        this.vInfluences = influences;
+        frame = new JFrame(isAmbassador ? "Ambassador Exchange Viewer" : "Influence Viewer");
+        initCommonUI();
+        updateUI();
+        frame.setVisible(true);
+    }
+
+    // Factor out common UI setup
+    private void initCommonUI() {
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setSize(400, 300);
         frame.setLocationRelativeTo(null);
@@ -47,54 +67,36 @@ public class SecretInfluenceViewer {
         actionButton = new JButton();
         actionButton.addActionListener(new ButtonListener());
         frame.add(actionButton, BorderLayout.SOUTH);
-
-        updateUI();
-        frame.setVisible(true);
     }
 
-    /**
-     * Constructor for ambassador exchange display.
-     */
-    private SecretInfluenceViewer(Influence[] influences) {
-        this.players = null;
-        this.ambassadorMode = true;
-        this.ambassadorInfluences = influences;
-        frame = new JFrame("Ambassador Exchange Viewer");
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.setSize(400, 300);
-        frame.setLocationRelativeTo(null);
-        frame.setLayout(new BorderLayout(10, 10));
-
-        messageLabel = new JLabel("", SwingConstants.CENTER);
-        messageLabel.setFont(messageLabel.getFont().deriveFont(16f));
-        frame.add(messageLabel, BorderLayout.NORTH);
-
-        influencePanel = new JPanel();
-        influencePanel.setLayout(new BoxLayout(influencePanel, BoxLayout.Y_AXIS));
-        frame.add(influencePanel, BorderLayout.CENTER);
-
-        actionButton = new JButton("Done");
-        actionButton.addActionListener(e -> frame.dispose());
-        frame.add(actionButton, BorderLayout.SOUTH);
-
-        updateUI();
-        frame.setVisible(true);
-    }
-
-    /**
-     * Updates the UI based on current state or ambassador mode.
-     */
+    // Updates the UI based on mode and whether the user has clicked “View”.
     private void updateUI() {
         influencePanel.removeAll();
-        if (ambassadorMode) {
-            messageLabel.setText("Ambassador: view and choose exchange cards:");
-            for (Influence inf : ambassadorInfluences) {
-                JLabel lbl = new JLabel("\u2022 " + inf.getName());
-                lbl.setAlignmentX(Component.CENTER_ALIGNMENT);
-                influencePanel.add(lbl);
-                influencePanel.add(Box.createVerticalStrut(5));
+
+        if (isInGameView) {
+            // In-game modes (ambassador or simple view)
+            if (!showingInfluences) {
+                messageLabel.setText("Click \"View\" to see your influences.");
+                actionButton.setText("View");
+            } else {
+                if (ambassadorMode) {
+                    messageLabel.setText("Ambassador: view and choose exchange cards:");
+                } else {
+                    messageLabel.setText("Your Influences (keep secret!):");
+                }
+                for (int i = 0; i < vInfluences.length; i++) {
+                    Influence inf = vInfluences[i];
+                    String name = (inf == null ? "None" : inf.getName());
+                    JLabel lbl = new JLabel((i + 1) + ". " + name);
+                    lbl.setAlignmentX(Component.CENTER_ALIGNMENT);
+                    influencePanel.add(lbl);
+                    influencePanel.add(Box.createVerticalStrut(5));
+                }
+                actionButton.setText("Done");
             }
+
         } else {
+            // Player-reveal sequence
             Player p = players[currentPlayer];
             if (!showingInfluences) {
                 messageLabel.setText(
@@ -102,8 +104,8 @@ public class SecretInfluenceViewer {
                 actionButton.setText("View");
             } else {
                 messageLabel.setText(p.getName() + "'s Influences (keep secret!):");
-                JLabel inf1 = new JLabel("\u2022 " + p.getInfluence1().getName());
-                JLabel inf2 = new JLabel("\u2022 " + p.getInfluence2().getName());
+                JLabel inf1 = new JLabel("1. " + p.getInfluence1().getName());
+                JLabel inf2 = new JLabel("2. " + p.getInfluence2().getName());
                 inf1.setAlignmentX(Component.CENTER_ALIGNMENT);
                 inf2.setAlignmentX(Component.CENTER_ALIGNMENT);
                 influencePanel.add(inf1);
@@ -113,56 +115,49 @@ public class SecretInfluenceViewer {
                         currentPlayer < players.length - 1 ? "Next Player" : "Done");
             }
         }
+
         frame.revalidate();
         frame.repaint();
     }
 
-    /**
-     * Step through states: view vs. next player.
-     */
+
+    // Shared button logic for both modes
     private class ButtonListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (!showingInfluences) {
-                showingInfluences = true;
+            if (isInGameView) {
+                if (!showingInfluences) {
+                    // user clicked “View” in in-game
+                    showingInfluences = true;
+                    updateUI();
+                } else {
+                    // user clicked “Done” in in-game
+                    frame.dispose();
+                }
             } else {
-                showingInfluences = false;
-                currentPlayer++;
-            }
-            if (currentPlayer >= players.length) {
-                frame.dispose();
-            } else {
-                updateUI();
+                // player-reveal mode
+                if (!showingInfluences) {
+                    showingInfluences = true;
+                } else {
+                    showingInfluences = false;
+                    currentPlayer++;
+                }
+                if (currentPlayer >= players.length) {
+                    frame.dispose();
+                } else {
+                    updateUI();
+                }
             }
         }
     }
 
-    /**
-     * Exposed method to launch the viewer for players.
-     */
+    // Exposed methods to launch the viewer
     public static void show(Player[] players) {
         SwingUtilities.invokeLater(() -> new SecretInfluenceViewer(players));
     }
 
-    /**
-     * Exposed method to launch ambassador exchange viewer.
-     */
-    public static void showAmbassador(Influence[] influences) {
-        SwingUtilities.invokeLater(() -> new SecretInfluenceViewer(influences));
-    }
-
-    /**
-     * Example usage; can be removed when called externally.
-     */
-    public static void main(String[] args) {
-        // Player reveal demo
-        Player[] players = {
-                new Player("Alice", 0),
-                new Player("Bob",   1)
-        };
-        SecretInfluenceViewer.show(players);
-
-        // Ambassador exchange demo
-
+    public static void showInfluences(Influence[] influences, boolean isAmbassadorMode) {
+        SwingUtilities.invokeLater(() ->
+                new SecretInfluenceViewer(influences, isAmbassadorMode));
     }
 }

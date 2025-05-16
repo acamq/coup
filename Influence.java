@@ -87,9 +87,23 @@ public class Influence {
     public static Influence random() {
         return INFLUENCES[ThreadLocalRandom.current().nextInt(INFLUENCES.length)];
     }
-
+    public String toString(){
+        if (this == null){
+            return "None";
+        }
+        return name;
+    }
     public boolean equals(Influence other){
-        if (other.name.equals(this.name)) return true;
+        if (other == null){
+            return false;
+        }
+        if (other.name.equals(this.name)){
+            return true;}
         else return false;
+    }
+    public static void main(String[] args){
+        for (int i = 0; i < 20; i++){
+            System.out.println(random());
+        }
     }
 }
