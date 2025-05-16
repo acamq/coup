@@ -34,7 +34,7 @@ public class Player {
     public String getInfo(){
         if (isOut()){
             return String.format(
-                    "Name: %s (Player #%d) is out.",
+                    "Name: %s (Player #%d) is out",
                     name, playerNum
             );
         }
@@ -91,9 +91,11 @@ public class Player {
             boolean removed = false;
             while (!removed) {
                 if (toLose == 1) {
+                    System.out.println(this.name + " lost a " + influence1);
                     influence1 = null;
                     removed = true;
                 } else if (toLose == 2) {
+                    System.out.println(this.name + " lost a " + influence2);
                     influence2 = null;
                     removed = true;
                 }

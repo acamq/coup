@@ -136,7 +136,7 @@ public class Game {
         String blocked = Game.getInput("Blocking player number?");
         if (!blocked.isEmpty()){
             int blocker = StringToInt.convertToInt(blocked.substring(0,1));
-            while (blocker -1 == player_i || blocker > players.length || blocker < 1 || blocker != player_i){
+            while (blocker -1 == player_i || blocker > players.length || blocker < 1 || players[blocker-1].isOut()){
                 blocker = StringToInt.convertToInt("Invalid player number.");
             }
             Player counter = players[blocker-1];
@@ -158,12 +158,12 @@ public class Game {
                     );
                     if (counter.getInfluence1().equals(influence)){
                         Influence toGive = Influence.random();
-                        SecretInfluenceViewer.showInfluences(new Influence[]{toGive}, false);
+                        SecretInfluenceViewer.showInfluences(new Influence[]{toGive, counter.getInfluence2()}, false);
                         counter.setInfluence1(toGive);
                     }
                     else if (counter.getInfluence2().equals(influence)){
                         Influence toGive = Influence.random();
-                        SecretInfluenceViewer.showInfluences(new Influence[]{toGive}, false);
+                        SecretInfluenceViewer.showInfluences(new Influence[]{counter.getInfluence1(), toGive}, false);
                         counter.setInfluence2(toGive);
                     }
                     return false;
@@ -206,7 +206,7 @@ public class Game {
         String challenged = getInput("Challenging player number?");
         if (!challenged.isEmpty()){
             int challengePlayer = StringToInt.convertToInt(challenged.substring(0,1));
-            while (challengePlayer -1 == player_i || challengePlayer > players.length || challengePlayer < 1|| challengePlayer == player_i){
+            while (challengePlayer -1 == player_i || challengePlayer > players.length || challengePlayer < 1 || players[challengePlayer-1].isOut()){
                 challengePlayer = StringToInt.convertToInt("Invalid player number.");
             }
             Player challenger = players[challengePlayer-1];
