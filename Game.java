@@ -136,7 +136,7 @@ public class Game {
         String blocked = Game.getInput("Blocking player number?");
         if (!blocked.isEmpty()){
             int blocker = StringToInt.convertToInt(blocked.substring(0,1));
-            while (blocker -1 == player_i || blocker > players.length || blocker < 1){
+            while (blocker -1 == player_i || blocker > players.length || blocker < 1 || blocker != player_i){
                 blocker = StringToInt.convertToInt("Invalid player number.");
             }
             Player counter = players[blocker-1];
@@ -205,11 +205,11 @@ public class Game {
         Player current = players[player_i];
         String challenged = getInput("Challenging player number?");
         if (!challenged.isEmpty()){
-            int blocker = StringToInt.convertToInt(challenged.substring(0,1));
-            while (blocker -1 == player_i || blocker > players.length || blocker < 1){
-                blocker = StringToInt.convertToInt("Invalid player number.");
+            int challengePlayer = StringToInt.convertToInt(challenged.substring(0,1));
+            while (challengePlayer -1 == player_i || challengePlayer > players.length || challengePlayer < 1|| challengePlayer == player_i){
+                challengePlayer = StringToInt.convertToInt("Invalid player number.");
             }
-            Player challenger = players[blocker-1];
+            Player challenger = players[challengePlayer-1];
             if (current.getInfluence1().equals(influence)||current.getInfluence2().equals(influence)){
                 System.out.println(
                         String.format("%1$s had an %2$s. %3$s, you lose the challenge and an influence.",
@@ -282,17 +282,22 @@ public class Game {
             return false;
         }
     }
-
-    public int checkValidTarget(int target) {
-        int newTarget = target;
-        while (newTarget < 0
-                || newTarget >= players.length
-                || players[newTarget].isOut()) {
-            newTarget = StringToInt.stringToInt("Invalid target. Please choose a new target.");
+    //checks for validity and converts to index
+    public int checkValidTarget(int current_p, int initialPlayerNumber) {
+        int idx = initialPlayerNumber - 1;
+        while (idx < 0
+                || idx >= players.length
+                || players[idx].isOut()
+                || idx == current_p)
+        {
+            int pick = StringToInt.stringToInt(
+                    "Invalid target. Please choose a new target (1–"
+                            + players.length + "):");
+            idx = pick - 1;
         }
-        return newTarget;
+        return idx;
     }
-
+    //Main loop that runs through people's turns
     public void Play(){
         getPlayers();
         System.out.println(ActionsPrinter.welcomeMessage());
@@ -302,7 +307,9 @@ public class Game {
         while (!win){
             boolean tookAction = false;
             Player currentPlayer = players[player_i];
+            boolean canPlay = currentPlayer.isOut();
             boolean mustCoup = currentPlayer.mustCoup();
+            if (!canPlay){
             for (Player p : players){
                 System.out.print(p.getInfo() + ", ");
             }
@@ -310,8 +317,8 @@ public class Game {
             System.out.println("It is " + currentPlayer + "'s turn.");
             while(!tookAction) {
                 if (mustCoup){
-                    int target = StringToInt.stringToInt(("You must launch a coup. Please choose a target."))-1;
-                    target = checkValidTarget(target);
+                    int target = StringToInt.stringToInt(("You must launch a coup. Please choose a target."));
+                    target = checkValidTarget(player_i, target);
                     tookAction = coup(player_i, target);
                     continue;
                 }
@@ -326,21 +333,21 @@ public class Game {
                     tookAction = foreignAid(player_i);
                 }
                 if (action == 3) {
-                    int target = StringToInt.stringToInt("Please enter the target player number") - 1;
-                    target = checkValidTarget(target);
+                    int target = StringToInt.stringToInt("Please enter the target player number");
+                    target = checkValidTarget(player_i, target);
                     tookAction = coup(player_i, target);
                 }
                 if (action == 4){
                     tookAction = tax(player_i);
                 }
                 if (action == 5){
-                    int target = StringToInt.stringToInt("Please enter the target player number") - 1;
-                    target = checkValidTarget(target);
+                    int target = StringToInt.stringToInt("Please enter the target player number");
+                    target = checkValidTarget(player_i, target);
                     tookAction = assassination(player_i, target);
                 }
                 if (action == 6){
-                    int target =  StringToInt.stringToInt("Please enter the target player number") - 1;
-                    target = checkValidTarget(target);
+                    int target =  StringToInt.stringToInt("Please enter the target player number");
+                    target = checkValidTarget(player_i, target);
                     tookAction = steal(player_i, target);
                 }
                 if (action == 7){
@@ -355,6 +362,7 @@ public class Game {
                 if (!tookAction){
                     System.out.println("Please choose another action.");
                 }
+            }
             }
             win = checkWin();
             player_i = (player_i + 1) % max;
