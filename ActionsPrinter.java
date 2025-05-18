@@ -1,4 +1,5 @@
 public class ActionsPrinter {
+    /**String methods to avoid clutter*/
     public static int numActions = 9;
     public static String welcomeMessage(){
         String welcomeMessage =

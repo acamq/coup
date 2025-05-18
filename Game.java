@@ -111,20 +111,35 @@ public class Game {
             if (has1 && has2) {
                 exchange = new Influence[]{exchanging.getInfluence1(), exchanging.getInfluence2(), Influence.random(), Influence.random()};
                 SecretInfluenceViewer.showInfluences(exchange, true);
+                int chosen1 = StringToInt.stringToInt("Choose one influence to keep.");
+                while (chosen1 > exchange.length || chosen1 < 1){
+                    chosen1 = StringToInt.stringToInt("Invalid input. Please enter a number between 1 and " + exchange.length);
+                }
+                int chosen2 = StringToInt.stringToInt("Choose another influence to keep");
+                while (chosen2 > exchange.length || chosen2 < 1 || chosen1 == chosen2){
+                    chosen2 = StringToInt.stringToInt("Invalid input. Please enter a number between 1 and " + exchange.length + ", and do not choose the same influence.");
+                }
+                exchanging.setInfluence1(exchange[chosen1-1]);
+                exchanging.setInfluence2(exchange[chosen2-1]);
             } else {
                 if (has1) {
                     exchange = new Influence[]{exchanging.getInfluence1(), Influence.random(), Influence.random()};
+                    SecretInfluenceViewer.showInfluences(exchange, true);
+                    int chosen = StringToInt.stringToInt("Choose the influence you would like to keep.");
+                    while (chosen > exchange.length || chosen < 1){
+                        chosen = StringToInt.stringToInt("Invalid input. Please enter a number between 1 and " + exchange.length);
+                    }
+                    exchanging.setInfluence1(exchange[chosen-1]);
                 } else {
                     exchange = new Influence[]{exchanging.getInfluence2(), Influence.random(), Influence.random()};
+                    SecretInfluenceViewer.showInfluences(exchange, true);
+                    int chosen = StringToInt.stringToInt("Choose the influence you would like to keep.");
+                    while (chosen > exchange.length || chosen < 1){
+                        chosen = StringToInt.stringToInt("Invalid input. Please enter a number between 1 and " + exchange.length);
+                    }
+                    exchanging.setInfluence2(exchange[chosen-1]);
                 }
             }
-            SecretInfluenceViewer.showInfluences(exchange, true);
-            String chosen = Game.getInput("Choose two influences by entering the number of the influence, a space, and another number.");
-            int chosen1 = StringToInt.convertToInt(chosen.substring(0, 1)) - 1;
-            int chosen2 = StringToInt.convertToInt(chosen.substring(2)) - 1;
-
-            exchanging.setInfluence1(exchange[chosen1]);
-            exchanging.setInfluence2(exchange[chosen2]);
             System.out.println("You have exchanged.");
         }
         return true;
@@ -141,7 +156,7 @@ public class Game {
                 blocker = StringToInt.convertToInt("Invalid player number.");
             }
             Player counter = players[blocker-1];
-            String challengeBlock = Game.getInput("Challenge the block? Input anything to challenge.");
+            String challengeBlock = Game.getInput(current + ", challenge the block? Input anything to challenge.");
             if (!challengeBlock.isEmpty()){
                 if (influence.equals(counter.getInfluence1())||influence.equals(counter.getInfluence2())){
                     System.out.println(
@@ -321,7 +336,7 @@ public class Game {
                     int target = StringToInt.stringToInt(("You must launch a coup. Please choose a target."));
                     target = checkValidTarget(player_i, target);
                     tookAction = coup(player_i, target);
-                    continue;
+                    continue; 
                 }
                 int action = StringToInt.stringToInt(ActionsPrinter.getActions());
                 while (action < 0 || action > ActionsPrinter.numActions) {

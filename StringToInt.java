@@ -1,5 +1,5 @@
 import java.util.Scanner;
-
+/**Class to get input and convert it to an int*/
 public class StringToInt {
     public static int convertToInt(String toConvert){
         int num = -1;

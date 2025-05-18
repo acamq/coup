@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.Arrays;
-
+/**Deck class to mimic a real deck of cards*/
+//I could implement this, but I think it's more fun without a limit on the number of each influence
 public class Deck {
 
     private ArrayList<Influence> deck;

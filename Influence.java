@@ -84,6 +84,7 @@ public class Influence {
     /**
      * Returns a random Influence from the available values.
      */
+
     public static Influence random() {
         return INFLUENCES[ThreadLocalRandom.current().nextInt(INFLUENCES.length)];
     }
@@ -93,6 +94,7 @@ public class Influence {
         }
         return name;
     }
+
     public boolean equals(Influence other){
         if (other == null){
             return false;
@@ -100,10 +102,5 @@ public class Influence {
         if (other.name.equals(this.name)){
             return true;}
         else return false;
-    }
-    public static void main(String[] args){
-        for (int i = 0; i < 20; i++){
-            System.out.println(random());
-        }
     }
 }

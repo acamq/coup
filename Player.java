@@ -1,9 +1,9 @@
 public class Player {
-    private String name;
+    private final String name;
     private int tokens;
     private Influence influence1;
     private Influence influence2;
-    private int playerNum;
+    private final int playerNum;
     private boolean out;
 
     public Player(String name, int playerNum){
@@ -42,6 +42,12 @@ public class Player {
                 name, playerNum, tokens, numInfluences()
         );
     }
+    public int numInfluences(){
+        int count = 0;
+        if (influence1 != null){count++;}
+        if  (influence2 != null){count++;}
+        return count;
+    }
     public int getTokens(){
         return tokens;
     }
@@ -62,22 +68,11 @@ public class Player {
         return name;
     }
 
-/*public boolean canCoup(){
-        return tokens >= 7;
-    }
-
- */
-
     public boolean mustCoup(){
         return tokens >= 10;
     }
-    public int numInfluences(){
-        int count = 0;
-        if (influence1 != null){count++;}
-        if  (influence2 != null){count++;}
-        return count;
-    }
 
+    //General method to remove a function for all cases.
     public void loseInfluence(String reason){
         if (influence1 == null || influence2 == null){
             System.out.println(this.name + ", you are out!");
