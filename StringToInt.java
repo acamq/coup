@@ -7,17 +7,17 @@ public class StringToInt {
         try {
             num = Integer.parseInt(str);
         } catch (NumberFormatException e) {
-            System.out.println("Error: Invalid string for Integer.parseInt()");
+            //System.out.println("Error: Invalid string for Integer.parseInt()");
         }
 
         // Using Integer.valueOf()
         try {
             num = Integer.valueOf(str);
         } catch (NumberFormatException e) {
-            System.out.println("Error: Invalid string for Integer.valueOf()");
+            //System.out.println("Error: Invalid string for Integer.valueOf()");
         }
         if (num < 0){
-            System.out.println("Error: Invalid input.");
+            //System.out.println("Error: Invalid input.");
             return stringToInt("Please enter the number again.");
         }
         return num;
@@ -44,7 +44,7 @@ public class StringToInt {
 
         if (num < 0) {
             System.out.println("Error: Invalid string. Please enter an integer");
-            return stringToInt(toPrint); // fixed by adding return
+            return stringToInt(toPrint);
         }
         return num;
     }
