@@ -94,9 +94,16 @@ public class Game {
             }
         }
         if (canSteal){
-            players[player_thief].addTokens(2);
-            players[player_target].removeTokens(2);
-            System.out.println("You successfully stole 2 tokens!");
+            if (players[player_target].getTokens() == 1) {
+                players[player_thief].addTokens(1);
+                players[player_target].removeTokens(1);
+                System.out.println("You successfully stole 1 token!");
+            }
+            else{
+                players[player_thief].addTokens(2);
+                players[player_target].removeTokens(2);
+                System.out.println("You successfully stole 2 tokens!");
+            }
         }
         return true;
     }
@@ -145,8 +152,6 @@ public class Game {
         return true;
     }
 
-
-
     public boolean blockAndChallenge(int player_i, String action, Influence influence){
         Player current = players[player_i];
         String blocked = Game.getInput("Blocking player number?");
@@ -156,56 +161,21 @@ public class Game {
                 blocker = StringToInt.convertToInt("Invalid player number.");
             }
             Player counter = players[blocker-1];
-            String challengeBlock = Game.getInput(current + ", challenge the block? Input anything to challenge.");
-            if (!challengeBlock.isEmpty()){
-                if (influence.equals(counter.getInfluence1())||influence.equals(counter.getInfluence2())){
-                    System.out.println(
-                            String.format("%1$s had an %2$s. %3$s, you lose the challenge and an influence.",
-                                    counter, influence, current)
-                    );
-                    current.loseInfluence(CHALLENGEREASON);
-                    System.out.println(
-                            String.format("%s, your %s has been blocked by %s",
-                                    current, action, counter)
-                    );
-                    System.out.println(
-                            String.format("%s, you will receive a random influence to replace the revealed one.\nPlease check your tabs to see your influences.",
-                                    counter)
-                    );
-                    if (influence.equals(counter.getInfluence1())){
-                        Influence toGive = Influence.random();
-                        SecretInfluenceViewer.showInfluences(new Influence[]{toGive, counter.getInfluence2()}, false);
-                        counter.setInfluence1(toGive);
-                    }
-                    else if (influence.equals(counter.getInfluence2())){
-                        Influence toGive = Influence.random();
-                        SecretInfluenceViewer.showInfluences(new Influence[]{counter.getInfluence1(), toGive}, false);
-                        counter.setInfluence2(toGive);
-                    }
-                    return false;
-                }
-                else {
-                    System.out.println(
-                            String.format(
-                                    "%1$s did not have a %2$s! %1$s, you lose the challenge and an influence.",
-                                    counter, influence
-                            )
-                    );
-                    counter.loseInfluence(CHALLENGEREASON);
-                    System.out.println(
-                            String.format("%s, your %s was successful.",
-                                    current, action)
-                    );
-                    return true;
-                }
-            }
-            else {
+            System.out.println("Challenge the block?");
+            boolean challengeStatus = challengeCurrent(blocker -1, action, influence);
+            if (challengeStatus){
                 System.out.println(
                         String.format("%s, your %s has been blocked by %s",
                                 current, action, counter)
                 );
-
                 return false;
+            }
+            else {
+                System.out.println(
+                        String.format("%s, your %s was successful.",
+                                current, action)
+                );
+                return true;
             }
         }
         else{
@@ -216,7 +186,7 @@ public class Game {
             return true;
         }
     }
-    
+
     public boolean challengeCurrent(int player_i, String action, Influence influence){
         Player current = players[player_i];
         String challenged = getInput("Challenging player number?");
@@ -261,7 +231,7 @@ public class Game {
         }
         return true;
     }
-    public void getPlayers(){
+    public void setPlayers(){
         int numPlayers = StringToInt.stringToInt("Number of players? 2-6");
         while (numPlayers == 1 || numPlayers > 6){
             numPlayers = StringToInt.stringToInt("Invalid input. Must have 2 to 6 players");
@@ -314,8 +284,8 @@ public class Game {
         return idx;
     }
     //Main loop that runs through people's turns
-    public void Play(){
-        getPlayers();
+    public void play(){
+        setPlayers();
         System.out.println(ActionsPrinter.welcomeMessage());
         boolean win = false;
         int player_i = 0;
@@ -326,59 +296,59 @@ public class Game {
             boolean canPlay = currentPlayer.isOut();
             boolean mustCoup = currentPlayer.mustCoup();
             if (!canPlay){
-            for (Player p : players){
-                System.out.print(p.getInfo() + ", ");
-            }
-            System.out.println();
-            System.out.println("It is " + currentPlayer + "'s turn.");
-            while(!tookAction) {
-                if (mustCoup){
-                    int target = StringToInt.stringToInt(("You must launch a coup. Please choose a target."));
-                    target = checkValidTarget(player_i, target);
-                    tookAction = coup(player_i, target);
-                    continue; 
+                for (Player p : players){
+                    System.out.print(p.getInfo() + ", ");
                 }
-                int action = StringToInt.stringToInt(ActionsPrinter.getActions());
-                while (action < 0 || action > ActionsPrinter.numActions) {
-                    action = StringToInt.stringToInt("Invalid input. Please choose an action");
+                System.out.println();
+                System.out.println("It is " + currentPlayer + "'s turn.");
+                while(!tookAction) {
+                    if (mustCoup){
+                        int target = StringToInt.stringToInt(("You must launch a coup. Please choose a target."));
+                        target = checkValidTarget(player_i, target);
+                        tookAction = coup(player_i, target);
+                        continue;
+                    }
+                    int action = StringToInt.stringToInt(ActionsPrinter.getActions());
+                    while (action < 0 || action > ActionsPrinter.numActions) {
+                        action = StringToInt.stringToInt("Invalid input. Please choose an action");
+                    }
+                    if (action == 1) {
+                        tookAction = income(player_i);
+                    }
+                    if (action == 2) {
+                        tookAction = foreignAid(player_i);
+                    }
+                    if (action == 3) {
+                        int target = StringToInt.stringToInt("Please enter the target player number");
+                        target = checkValidTarget(player_i, target);
+                        tookAction = coup(player_i, target);
+                    }
+                    if (action == 4){
+                        tookAction = tax(player_i);
+                    }
+                    if (action == 5){
+                        int target = StringToInt.stringToInt("Please enter the target player number");
+                        target = checkValidTarget(player_i, target);
+                        tookAction = assassination(player_i, target);
+                    }
+                    if (action == 6){
+                        int target =  StringToInt.stringToInt("Please enter the target player number");
+                        target = checkValidTarget(player_i, target);
+                        tookAction = steal(player_i, target);
+                    }
+                    if (action == 7){
+                        tookAction = exchange(player_i);
+                    }
+                    if (action == 8){
+                        SecretInfluenceViewer.showInfluences(new Influence[]{currentPlayer.getInfluence1(), currentPlayer.getInfluence2()},false);
+                    }
+                    if (action == 9){
+                        System.out.println(ActionsPrinter.instructions());
+                    }
+                    if (!tookAction){
+                        System.out.println("Please choose another action.");
+                    }
                 }
-                if (action == 1) {
-                    tookAction = income(player_i);
-                }
-                if (action == 2) {
-                    tookAction = foreignAid(player_i);
-                }
-                if (action == 3) {
-                    int target = StringToInt.stringToInt("Please enter the target player number");
-                    target = checkValidTarget(player_i, target);
-                    tookAction = coup(player_i, target);
-                }
-                if (action == 4){
-                    tookAction = tax(player_i);
-                }
-                if (action == 5){
-                    int target = StringToInt.stringToInt("Please enter the target player number");
-                    target = checkValidTarget(player_i, target);
-                    tookAction = assassination(player_i, target);
-                }
-                if (action == 6){
-                    int target =  StringToInt.stringToInt("Please enter the target player number");
-                    target = checkValidTarget(player_i, target);
-                    tookAction = steal(player_i, target);
-                }
-                if (action == 7){
-                    tookAction = exchange(player_i);
-                }
-                if (action == 8){
-                    SecretInfluenceViewer.showInfluences(new Influence[]{currentPlayer.getInfluence1(), currentPlayer.getInfluence2()},false);
-                }
-                if (action == 9){
-                    System.out.println(ActionsPrinter.instructions());
-                }
-                if (!tookAction){
-                    System.out.println("Please choose another action.");
-                }
-            }
             }
             win = checkWin();
             player_i = (player_i + 1) % max;
@@ -393,6 +363,6 @@ public class Game {
 
     public static void main(String[] args){
         Game game = new Game();
-        game.Play();
+        game.play();
     }
 }
