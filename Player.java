@@ -21,6 +21,9 @@ public class Player {
     }
     public void removeTokens(int token){
         this.tokens -= token;
+        if (this.tokens < 0){
+            this.tokens = 0;
+        }
     }
     public boolean isOut(){
         return out;

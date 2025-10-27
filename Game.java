@@ -105,16 +105,12 @@ public class Game {
             }
         }
         if (canSteal){
-            if (players[player_target].getTokens() == 1) {
-                players[player_thief].addTokens(1);
-                players[player_target].removeTokens(1);
-                System.out.println("You successfully stole 1 token!");
+            int amount = Math.min(2, players[player_target].getTokens());
+            if (amount > 0) {
+                players[player_thief].addTokens(amount);
+                players[player_target].removeTokens(amount);
             }
-            else{
-                players[player_thief].addTokens(2);
-                players[player_target].removeTokens(2);
-                System.out.println("You successfully stole 2 tokens!");
-            }
+            System.out.println("You successfully stole " + amount + (amount == 1 ? " token!" : " tokens!"));
         }
         return true;
     }
