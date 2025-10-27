@@ -23,7 +23,7 @@ public class Game {
         return true;
     }
     public boolean foreignAid(int player_i){
-        boolean canAid = blockAndChallenge(player_i, "foreign aid", Influence.INFLUENCES[0], null);
+        boolean canAid = blockAndChallenge(player_i, "foreign aid", Influence.INFLUENCES[0]);
         if (canAid){
             players[player_i].addTokens(2);
             System.out.println("You gained 2 tokens.");
@@ -157,6 +157,10 @@ public class Game {
             System.out.println("You have exchanged.");
         }
         return true;
+    }
+
+    public boolean blockAndChallenge(int player_i, String action, Influence influence){
+        return blockAndChallenge(player_i, action, influence, null);
     }
 
     public boolean blockAndChallenge(int player_i, String action, Influence influence, Integer allowedBlocker){
