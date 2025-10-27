@@ -2,10 +2,17 @@ import java.util.Scanner;
 
 public class Game {
     private Player[] players;
+    private static Scanner inputScanner = new Scanner(System.in);
     public static String getInput(String toPrint){
-        Scanner scanner = new Scanner(System.in);
         System.out.println(toPrint);
-        return scanner.nextLine();
+        if (inputScanner.hasNextLine()) {
+            return inputScanner.nextLine();
+        }
+        return "";
+    }
+
+    static void resetInputScanner(){
+        inputScanner = new Scanner(System.in);
     }
 
     private final String CHALLENGEREASON = ", you lost a challenge. Please choose an influence to lose.";
@@ -16,7 +23,7 @@ public class Game {
         return true;
     }
     public boolean foreignAid(int player_i){
-        boolean canAid = blockAndChallenge(player_i, "foreign aid", Influence.INFLUENCES[0]);
+        boolean canAid = blockAndChallenge(player_i, "foreign aid", Influence.INFLUENCES[0], null);
         if (canAid){
             players[player_i].addTokens(2);
             System.out.println("You gained 2 tokens.");
@@ -50,13 +57,13 @@ public class Game {
             return false;
         }
         boolean canKill = true;
-        String choice = Game.getInput("Block (1) or challenge (2)");
+        String choice = Game.getInput("Block (1) or challenge (2) (only the target may block)");
         while (!(choice.equals("1") || choice.equals("2")|| choice.isEmpty())) {
-            choice = Game.getInput("Invalid input. Block (1) or challenge (2)");
+            choice = Game.getInput("Invalid input. Block (1) or challenge (2) (only the target may block)");
         }
         if (!choice.isEmpty()) {
             if (choice.equals("1")) {
-                canKill = blockAndChallenge(player_killer, "assassination", Influence.INFLUENCES[4]);
+                canKill = blockAndChallenge(player_killer, "assassination", Influence.INFLUENCES[4], player_target);
             } else if (choice.equals("2")){
                 canKill = challengeCurrent(player_killer, "assassination", Influence.INFLUENCES[1]);
             }
@@ -71,22 +78,22 @@ public class Game {
 
     public boolean steal(int player_thief, int player_target){
         boolean canSteal = true;
-        String choice = Game.getInput("Block (1) or challenge (2)");
+        String choice = Game.getInput("Block (1) or challenge (2) (only the target may block)");
         while (!(choice.equals("1") || choice.equals("2")|| choice.isEmpty())) {
-            choice = Game.getInput("Invalid input. Block (1) or challenge (2)");
+            choice = Game.getInput("Invalid input. Block (1) or challenge (2) (only the target may block)");
         }
         if (!choice.isEmpty()) {
             if (choice.equals("1")) {
-                String willBlock = Game.getInput("Please choose Captain or Ambassador to block with.");
+                String willBlock = Game.getInput("Target player: choose Captain or Ambassador to block with.");
                 while (!(willBlock.equals("Captain")||willBlock.equals("Ambassador")||willBlock.isEmpty())){
-                    willBlock = Game.getInput("Invalid input. Please choose Captain or Ambassador");
+                    willBlock = Game.getInput("Invalid input. Target player: choose Captain or Ambassador");
                 }
                 if (!willBlock.isEmpty()){
                     if (willBlock.equals("Captain")){
-                        canSteal = blockAndChallenge(player_thief, "steal", Influence.INFLUENCES[2]);
+                        canSteal = blockAndChallenge(player_thief, "steal", Influence.INFLUENCES[2], player_target);
                     }
                     if (willBlock.equals("Ambassador")){
-                        canSteal = blockAndChallenge(player_thief, "steal", Influence.INFLUENCES[3]);
+                        canSteal = blockAndChallenge(player_thief, "steal", Influence.INFLUENCES[3], player_target);
                     }
                 }
             } else if (choice.equals("2")){
@@ -152,13 +159,30 @@ public class Game {
         return true;
     }
 
-    public boolean blockAndChallenge(int player_i, String action, Influence influence){
+    public boolean blockAndChallenge(int player_i, String action, Influence influence, Integer allowedBlocker){
         Player current = players[player_i];
-        String blocked = Game.getInput("Blocking player number?");
+        String prompt = "Blocking player number?";
+        if (allowedBlocker != null){
+            prompt = String.format("Blocking player number? (Only player %d may block.)", allowedBlocker + 1);
+        }
+        String blocked = Game.getInput(prompt);
         if (!blocked.isEmpty()){
-            int blocker = StringToInt.convertToInt(blocked.substring(0,1));
-            while (blocker -1 == player_i || blocker > players.length || blocker < 1 || players[blocker-1].isOut()){
-                blocker = StringToInt.convertToInt("Invalid player number.");
+            String trimmedBlock = blocked.trim();
+            while (trimmedBlock.isEmpty()){
+                trimmedBlock = Game.getInput(prompt).trim();
+            }
+            int blocker = StringToInt.convertToInt(trimmedBlock);
+            while (blocker -1 == player_i || blocker > players.length || blocker < 1 || players[blocker-1].isOut()
+                    || (allowedBlocker != null && blocker - 1 != allowedBlocker)){
+                String invalidMessage = "Invalid player number.";
+                if (allowedBlocker != null){
+                    invalidMessage = String.format("Invalid player number. Only player %d may block this action.", allowedBlocker + 1);
+                }
+                String retry = Game.getInput(invalidMessage).trim();
+                while (retry.isEmpty()){
+                    retry = Game.getInput(invalidMessage).trim();
+                }
+                blocker = StringToInt.convertToInt(retry);
             }
             Player counter = players[blocker-1];
             System.out.println("Challenge the block?");
