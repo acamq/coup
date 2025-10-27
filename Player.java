@@ -7,17 +7,13 @@ public class Player {
     private boolean out;
 
     public Player(String name, int playerNum){
-        this.name = name;
-        this.tokens = 2;
-        this.influence1 = Influence.random();
-        this.influence2 = Influence.random();
-        this.playerNum = playerNum;
+        this(name, playerNum, 2);
     }
     public Player(String name, int playerNum, int tokens){
         this.name = name;
         this.tokens = tokens;
-        this.influence1 = Influence.random();
-        this.influence2 = Influence.random();
+        this.influence1 = null;
+        this.influence2 = null;
         this.playerNum = playerNum;
     }
     public void addTokens(int token){
@@ -25,6 +21,9 @@ public class Player {
     }
     public void removeTokens(int token){
         this.tokens -= token;
+        if (this.tokens < 0){
+            this.tokens = 0;
+        }
     }
     public boolean isOut(){
         return out;
@@ -73,30 +72,36 @@ public class Player {
     }
 
     //General method to remove a function for all cases.
-    public void loseInfluence(String reason){
+    public Influence loseInfluence(String reason){
+        if (influence1 == null && influence2 == null){
+            return null;
+        }
         if (influence1 == null || influence2 == null){
+            Influence remaining = influence1 != null ? influence1 : influence2;
             System.out.println(this.name + ", you are out!");
             influence1 = null;
             influence2 = null;
             out = true;
+            return remaining;
+        }
+        int toLose = StringToInt.stringToInt(this.name+reason+"\nPlease choose an influence to lose by inputting 1 or 2.");
+        while (toLose != 1 && toLose != 2){
+            toLose = StringToInt.stringToInt("Invalid input. Please choose influence 1 or 2.");
+        }
+        Influence lost;
+        if (toLose == 1){
+            lost = influence1;
+            System.out.println(this.name + " lost a " + influence1);
+            influence1 = null;
         }
         else{
-            int toLose = StringToInt.stringToInt(this.name+reason+"\nPlease choose an influence to lose by inputting 1 or 2.");
-            boolean removed = false;
-            while (!removed) {
-                if (toLose == 1) {
-                    System.out.println(this.name + " lost a " + influence1);
-                    influence1 = null;
-                    removed = true;
-                } else if (toLose == 2) {
-                    System.out.println(this.name + " lost a " + influence2);
-                    influence2 = null;
-                    removed = true;
-                }
-                else{
-                    toLose = StringToInt.stringToInt("Invalid input. Please choose influence 1 or 2.");
-                }
-            }
+            lost = influence2;
+            System.out.println(this.name + " lost a " + influence2);
+            influence2 = null;
         }
+        if (influence1 == null && influence2 == null){
+            out = true;
+        }
+        return lost;
     }
 }
