@@ -317,7 +317,7 @@ public class Game {
     }
     public void setPlayers(){
         int numPlayers = StringToInt.stringToInt("Number of players? 2-6");
-        while (numPlayers == 1 || numPlayers > 6){
+        while (numPlayers < 2 || numPlayers > 6){
             numPlayers = StringToInt.stringToInt("Invalid input. Must have 2 to 6 players");
         }
         players = new Player[numPlayers];
