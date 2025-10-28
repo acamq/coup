@@ -242,25 +242,19 @@ public class Game {
             System.out.println("Challenge the block?");
             boolean challengeStatus = challengeCurrent(blocker -1, action, influence);
             if (challengeStatus){
-                System.out.println(
-                        String.format("%s, your %s has been blocked by %s",
-                                current, action, counter)
-                );
+                System.out.printf("%s, your %s has been blocked by %s%n",
+                        current, action, counter);
                 return false;
             }
             else {
-                System.out.println(
-                        String.format("%s, your %s was successful.",
-                                current, action)
-                );
+                System.out.printf("%s, your %s was successful.%n",
+                        current, action);
                 return true;
             }
         }
         else{
-            System.out.println(
-                    String.format("%s, your %s was successful.",
-                            current, action)
-            );
+            System.out.printf("%s, your %s was successful.%n",
+                    current, action);
             return true;
         }
     }
@@ -275,16 +269,12 @@ public class Game {
             }
             Player challenger = players[challengePlayer-1];
             if (influence.equals(current.getInfluence1())||influence.equals(current.getInfluence2())){
-                System.out.println(
-                        String.format("%1$s had an %2$s. %3$s, you lose the challenge and an influence.",
-                                current, influence, challenger)
-                );
+                System.out.printf("%1$s had an %2$s. %3$s, you lose the challenge and an influence.%n",
+                        current, influence, challenger);
                 Influence challengerLost = challenger.loseInfluence(CHALLENGEREASON);
                 deck.discard(challengerLost);
-                System.out.println(
-                        String.format("%s, you will receive a random influence to replace the revealed one.\nPlease check your tabs to see your influences.",
-                                current)
-                );
+                System.out.printf("%s, you will receive a random influence to replace the revealed one.\nPlease check your tabs to see your influences.%n",
+                        current);
                 if (influence.equals(current.getInfluence1())){
                     Influence revealed = current.getInfluence1();
                     deck.returnToDeck(revealed);
@@ -302,11 +292,9 @@ public class Game {
                 return true;
             }
             else {
-                System.out.println(
-                        String.format(
-                                "%1$s did not have a %2$s! %1$s, you lose the challenge and an influence.",
-                                current, influence
-                        )
+                System.out.printf(
+                        "%1$s did not have a %2$s! %1$s, you lose the challenge and an influence.%n",
+                        current, influence
                 );
                 Influence lost = current.loseInfluence(CHALLENGEREASON);
                 deck.discard(lost);
@@ -355,12 +343,7 @@ public class Game {
                 numOut++;
             }
         }
-        if (numOut >= players.length -1){
-            return true;
-        }
-        else{
-            return false;
-        }
+        return numOut >= players.length - 1;
     }
     //checks for validity and converts to index
     public int checkValidTarget(int current_p, int initialPlayerNumber) {
