@@ -37,6 +37,7 @@ Running the packaged release is the preferred way to play the game and guarantee
    Replace `<version>` with the version number of the downloaded release.
 
 If you prefer to build the game yourself, you can also run it directly from the compiled sources:
+After compilation, launch the game with:
 
 ```bash
 java Game

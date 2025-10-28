@@ -1,11 +1,27 @@
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
 
 public class Game {
     private Player[] players;
+    private static Scanner inputScanner = new Scanner(System.in);
+    private final Deck deck;
+
+    public Game(){
+        deck = new Deck();
+    }
     public static String getInput(String toPrint){
-        Scanner scanner = new Scanner(System.in);
         System.out.println(toPrint);
-        return scanner.nextLine();
+        if (inputScanner.hasNextLine()) {
+            return inputScanner.nextLine();
+        }
+        return "";
+    }
+
+    static void resetInputScanner(){
+        inputScanner = new Scanner(System.in);
     }
 
     private final String CHALLENGEREASON = ", you lost a challenge. Please choose an influence to lose.";
@@ -29,7 +45,8 @@ public class Game {
             System.out.println("Not enough tokens!");
             return false;
         }
-        players[player_target].loseInfluence(" you have been targeted by a coup.");
+        Influence lost = players[player_target].loseInfluence(" you have been targeted by a coup.");
+        deck.discard(lost);
         players[player_i].removeTokens(7);
         System.out.println("You successfully launched a coup!");
         return true;
@@ -50,19 +67,20 @@ public class Game {
             return false;
         }
         boolean canKill = true;
-        String choice = Game.getInput("Block (1) or challenge (2)");
+        String choice = Game.getInput("Block (1) or challenge (2) (only the target may block)");
         while (!(choice.equals("1") || choice.equals("2")|| choice.isEmpty())) {
-            choice = Game.getInput("Invalid input. Block (1) or challenge (2)");
+            choice = Game.getInput("Invalid input. Block (1) or challenge (2) (only the target may block)");
         }
         if (!choice.isEmpty()) {
             if (choice.equals("1")) {
-                canKill = blockAndChallenge(player_killer, "assassination", Influence.INFLUENCES[4]);
+                canKill = blockAndChallenge(player_killer, "assassination", Influence.INFLUENCES[4], player_target);
             } else if (choice.equals("2")){
                 canKill = challengeCurrent(player_killer, "assassination", Influence.INFLUENCES[1]);
             }
         }
         if (canKill) {
-            players[player_target].loseInfluence(", you have been targeted by an assassination.");
+            Influence lost = players[player_target].loseInfluence(", you have been targeted by an assassination.");
+            deck.discard(lost);
             System.out.println("You successfully assassinated someone!");
         }
         players[player_killer].removeTokens(3);
@@ -71,22 +89,22 @@ public class Game {
 
     public boolean steal(int player_thief, int player_target){
         boolean canSteal = true;
-        String choice = Game.getInput("Block (1) or challenge (2)");
+        String choice = Game.getInput("Block (1) or challenge (2) (only the target may block)");
         while (!(choice.equals("1") || choice.equals("2")|| choice.isEmpty())) {
-            choice = Game.getInput("Invalid input. Block (1) or challenge (2)");
+            choice = Game.getInput("Invalid input. Block (1) or challenge (2) (only the target may block)");
         }
         if (!choice.isEmpty()) {
             if (choice.equals("1")) {
-                String willBlock = Game.getInput("Please choose Captain or Ambassador to block with.");
+                String willBlock = Game.getInput("Target player: choose Captain or Ambassador to block with.");
                 while (!(willBlock.equals("Captain")||willBlock.equals("Ambassador")||willBlock.isEmpty())){
-                    willBlock = Game.getInput("Invalid input. Please choose Captain or Ambassador");
+                    willBlock = Game.getInput("Invalid input. Target player: choose Captain or Ambassador");
                 }
                 if (!willBlock.isEmpty()){
                     if (willBlock.equals("Captain")){
-                        canSteal = blockAndChallenge(player_thief, "steal", Influence.INFLUENCES[2]);
+                        canSteal = blockAndChallenge(player_thief, "steal", Influence.INFLUENCES[2], player_target);
                     }
                     if (willBlock.equals("Ambassador")){
-                        canSteal = blockAndChallenge(player_thief, "steal", Influence.INFLUENCES[3]);
+                        canSteal = blockAndChallenge(player_thief, "steal", Influence.INFLUENCES[3], player_target);
                     }
                 }
             } else if (choice.equals("2")){
@@ -94,16 +112,12 @@ public class Game {
             }
         }
         if (canSteal){
-            if (players[player_target].getTokens() == 1) {
-                players[player_thief].addTokens(1);
-                players[player_target].removeTokens(1);
-                System.out.println("You successfully stole 1 token!");
+            int amount = Math.min(2, players[player_target].getTokens());
+            if (amount > 0) {
+                players[player_thief].addTokens(amount);
+                players[player_target].removeTokens(amount);
             }
-            else{
-                players[player_thief].addTokens(2);
-                players[player_target].removeTokens(2);
-                System.out.println("You successfully stole 2 tokens!");
-            }
+            System.out.println("You successfully stole " + amount + (amount == 1 ? " token!" : " tokens!"));
         }
         return true;
     }
@@ -116,7 +130,14 @@ public class Game {
             boolean has2 = !(exchanging.getInfluence2() == (null));
             Influence[] exchange;
             if (has1 && has2) {
-                exchange = new Influence[]{exchanging.getInfluence1(), exchanging.getInfluence2(), Influence.random(), Influence.random()};
+                List<Influence> pool = new ArrayList<>();
+                pool.add(exchanging.getInfluence1());
+                pool.add(exchanging.getInfluence2());
+                Influence draw1 = deck.draw();
+                Influence draw2 = deck.draw();
+                pool.add(draw1);
+                pool.add(draw2);
+                exchange = pool.toArray(new Influence[0]);
                 SecretInfluenceViewer.showInfluences(exchange, true);
                 int chosen1 = StringToInt.stringToInt("Choose one influence to keep.");
                 while (chosen1 > exchange.length || chosen1 < 1){
@@ -126,25 +147,61 @@ public class Game {
                 while (chosen2 > exchange.length || chosen2 < 1 || chosen1 == chosen2){
                     chosen2 = StringToInt.stringToInt("Invalid input. Please enter a number between 1 and " + exchange.length + ", and do not choose the same influence.");
                 }
+                Set<Integer> chosenIdx = new HashSet<>();
+                chosenIdx.add(chosen1 - 1);
+                chosenIdx.add(chosen2 - 1);
                 exchanging.setInfluence1(exchange[chosen1-1]);
                 exchanging.setInfluence2(exchange[chosen2-1]);
+                List<Influence> toReturn = new ArrayList<>();
+                for (int idx = 0; idx < exchange.length; idx++){
+                    if (!chosenIdx.contains(idx)){
+                        toReturn.add(exchange[idx]);
+                    }
+                }
+                deck.returnToDeck(toReturn);
             } else {
                 if (has1) {
-                    exchange = new Influence[]{exchanging.getInfluence1(), Influence.random(), Influence.random()};
+                    List<Influence> pool = new ArrayList<>();
+                    pool.add(exchanging.getInfluence1());
+                    Influence draw1 = deck.draw();
+                    Influence draw2 = deck.draw();
+                    pool.add(draw1);
+                    pool.add(draw2);
+                    exchange = pool.toArray(new Influence[0]);
                     SecretInfluenceViewer.showInfluences(exchange, true);
                     int chosen = StringToInt.stringToInt("Choose the influence you would like to keep.");
                     while (chosen > exchange.length || chosen < 1){
                         chosen = StringToInt.stringToInt("Invalid input. Please enter a number between 1 and " + exchange.length);
                     }
                     exchanging.setInfluence1(exchange[chosen-1]);
+                    List<Influence> toReturn = new ArrayList<>();
+                    for (int idx = 0; idx < exchange.length; idx++){
+                        if (idx != chosen - 1){
+                            toReturn.add(exchange[idx]);
+                        }
+                    }
+                    deck.returnToDeck(toReturn);
                 } else {
-                    exchange = new Influence[]{exchanging.getInfluence2(), Influence.random(), Influence.random()};
+                    List<Influence> pool = new ArrayList<>();
+                    pool.add(exchanging.getInfluence2());
+                    Influence draw1 = deck.draw();
+                    Influence draw2 = deck.draw();
+                    pool.add(draw1);
+                    pool.add(draw2);
+                    exchange = pool.toArray(new Influence[0]);
                     SecretInfluenceViewer.showInfluences(exchange, true);
                     int chosen = StringToInt.stringToInt("Choose the influence you would like to keep.");
                     while (chosen > exchange.length || chosen < 1){
                         chosen = StringToInt.stringToInt("Invalid input. Please enter a number between 1 and " + exchange.length);
                     }
                     exchanging.setInfluence2(exchange[chosen-1]);
+                    List<Influence> toReturn = new ArrayList<>();
+                    for (int idx = 0; idx < exchange.length; idx++){
+                        if (idx != chosen - 1){
+                            toReturn.add(exchange[idx]);
+                        }
+                    }
+                    deck.returnToDeck(toReturn);
                 }
             }
             System.out.println("You have exchanged.");
@@ -153,12 +210,33 @@ public class Game {
     }
 
     public boolean blockAndChallenge(int player_i, String action, Influence influence){
+        return blockAndChallenge(player_i, action, influence, null);
+    }
+
+    public boolean blockAndChallenge(int player_i, String action, Influence influence, Integer allowedBlocker){
         Player current = players[player_i];
-        String blocked = Game.getInput("Blocking player number?");
+        String prompt = "Blocking player number?";
+        if (allowedBlocker != null){
+            prompt = String.format("Blocking player number? (Only player %d may block.)", allowedBlocker + 1);
+        }
+        String blocked = Game.getInput(prompt);
         if (!blocked.isEmpty()){
-            int blocker = StringToInt.convertToInt(blocked.substring(0,1));
-            while (blocker -1 == player_i || blocker > players.length || blocker < 1 || players[blocker-1].isOut()){
-                blocker = StringToInt.convertToInt("Invalid player number.");
+            String trimmedBlock = blocked.trim();
+            while (trimmedBlock.isEmpty()){
+                trimmedBlock = Game.getInput(prompt).trim();
+            }
+            int blocker = StringToInt.convertToInt(trimmedBlock);
+            while (blocker -1 == player_i || blocker > players.length || blocker < 1 || players[blocker-1].isOut()
+                    || (allowedBlocker != null && blocker - 1 != allowedBlocker)){
+                String invalidMessage = "Invalid player number.";
+                if (allowedBlocker != null){
+                    invalidMessage = String.format("Invalid player number. Only player %d may block this action.", allowedBlocker + 1);
+                }
+                String retry = Game.getInput(invalidMessage).trim();
+                while (retry.isEmpty()){
+                    retry = Game.getInput(invalidMessage).trim();
+                }
+                blocker = StringToInt.convertToInt(retry);
             }
             Player counter = players[blocker-1];
             System.out.println("Challenge the block?");
@@ -201,20 +279,25 @@ public class Game {
                         String.format("%1$s had an %2$s. %3$s, you lose the challenge and an influence.",
                                 current, influence, challenger)
                 );
-                challenger.loseInfluence(CHALLENGEREASON);
+                Influence challengerLost = challenger.loseInfluence(CHALLENGEREASON);
+                deck.discard(challengerLost);
                 System.out.println(
                         String.format("%s, you will receive a random influence to replace the revealed one.\nPlease check your tabs to see your influences.",
                                 current)
                 );
                 if (influence.equals(current.getInfluence1())){
-                    Influence toGive = Influence.random();
-                    SecretInfluenceViewer.showInfluences(new Influence[]{toGive, current.getInfluence2()}, false);
-                    current.setInfluence1(toGive);
+                    Influence revealed = current.getInfluence1();
+                    deck.returnToDeck(revealed);
+                    Influence replacement = deck.draw();
+                    current.setInfluence1(replacement);
+                    SecretInfluenceViewer.showInfluences(new Influence[]{replacement, current.getInfluence2()}, false);
                 }
                 else if (influence.equals(current.getInfluence2())){
-                    Influence toGive = Influence.random();
-                    SecretInfluenceViewer.showInfluences(new Influence[]{current.getInfluence1(), toGive}, false);
-                    current.setInfluence2(toGive);
+                    Influence revealed = current.getInfluence2();
+                    deck.returnToDeck(revealed);
+                    Influence replacement = deck.draw();
+                    current.setInfluence2(replacement);
+                    SecretInfluenceViewer.showInfluences(new Influence[]{current.getInfluence1(), replacement}, false);
                 }
                 return true;
             }
@@ -225,7 +308,8 @@ public class Game {
                                 current, influence
                         )
                 );
-                current.loseInfluence(CHALLENGEREASON);
+                Influence lost = current.loseInfluence(CHALLENGEREASON);
+                deck.discard(lost);
                 return false;
             }
         }
@@ -242,12 +326,16 @@ public class Game {
             for (int i = 0; i<numPlayers; i++) {
                 String name = getInput("Name of player " + (i + 1));
                 players[i] = new Player(name, i, 1);
+                players[i].setInfluence1(deck.draw());
+                players[i].setInfluence2(deck.draw());
             }
         }
         else{
             for (int i = 0; i<numPlayers; i++){
                 String name = getInput("Name of player " + (i + 1));
                 players[i] = new Player(name, i+1);
+                players[i].setInfluence1(deck.draw());
+                players[i].setInfluence2(deck.draw());
             }
         }
         SecretInfluenceViewer.show(players);
