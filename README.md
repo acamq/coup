@@ -25,6 +25,18 @@ This produces the class files needed to run the game.
 
 ## Running
 
+Running the packaged release is the preferred way to play the game and guarantees you are using the tested build that accompanies each version:
+
+1. Visit the repository's **Releases** page and download the latest `coup-<version>.jar` asset.
+2. From the download directory, launch the game with:
+
+   ```bash
+   java -jar coup-<version>.jar
+   ```
+
+   Replace `<version>` with the version number of the downloaded release.
+
+If you prefer to build the game yourself, you can also run it directly from the compiled sources:
 After compilation, launch the game with:
 
 ```bash
@@ -49,4 +61,4 @@ Issues and pull requests are welcome. If you plan to submit changes, please ensu
 
 ## License
 
-This project does not currently include an explicit license. Please request permission from the repository owner before reusing or distributing the code.
+This project is dedicated to the public domain under the [CC0 1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/) public-domain dedication. You can review the complete legal code on the Creative Commons website linked above.
