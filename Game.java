@@ -325,6 +325,9 @@ public class Game {
             System.out.println("2 player modified version: each player starts with 1 token.");
             for (int i = 0; i<numPlayers; i++) {
                 String name = getInput("Name of player " + (i + 1));
+                while (name==null || name.isEmpty()){
+                    name = getInput("Name cannot be empty");
+                }
                 players[i] = new Player(name, i, 1);
                 players[i].setInfluence1(deck.draw());
                 players[i].setInfluence2(deck.draw());
@@ -333,6 +336,9 @@ public class Game {
         else{
             for (int i = 0; i<numPlayers; i++){
                 String name = getInput("Name of player " + (i + 1));
+                while (name==null || name.isEmpty()){
+                    name = getInput("Name cannot be empty");
+                }
                 players[i] = new Player(name, i+1);
                 players[i].setInfluence1(deck.draw());
                 players[i].setInfluence2(deck.draw());
