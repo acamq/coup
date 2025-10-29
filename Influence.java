@@ -3,14 +3,14 @@ import java.util.Arrays;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Influence {
-    private String name;
-    private boolean tax;
-    private boolean assassinate;
-    private boolean steal;
-    private boolean exchange;
-    private boolean blockAssassin;
-    private boolean blockSteal;
-    private boolean blockAid;
+    private final String name;
+    private final boolean tax;
+    private final boolean assassinate;
+    private final boolean steal;
+    private final boolean exchange;
+    private final boolean blockAssassin;
+    private final boolean blockSteal;
+    private final boolean blockAid;
 
     private Influence(String name,
                       boolean tax,
@@ -99,8 +99,6 @@ public class Influence {
         if (other == null){
             return false;
         }
-        if (other.name.equals(this.name)){
-            return true;}
-        else return false;
+        return other.name.equals(this.name);
     }
 }
