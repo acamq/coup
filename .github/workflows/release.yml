@@ -55,6 +55,7 @@ jobs:
         with:
           tag_name: ${{ github.ref_name }}
           release_name: ${{ github.ref_name }}
+          generate_release_notes: true
           draft: false
           prerelease: false
 
