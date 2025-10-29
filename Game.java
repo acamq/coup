@@ -24,8 +24,6 @@ public class Game {
         inputScanner = new Scanner(System.in);
     }
 
-    private final String CHALLENGEREASON = ", you lost a challenge. Please choose an influence to lose.";
-
     public boolean income(int player_i){
         players[player_i].addTokens(1);
         System.out.println("You gained a token.");
@@ -74,7 +72,7 @@ public class Game {
         if (!choice.isEmpty()) {
             if (choice.equals("1")) {
                 canKill = blockAndChallenge(player_killer, "assassination", Influence.INFLUENCES[4], player_target);
-            } else if (choice.equals("2")){
+            } else {
                 canKill = challengeCurrent(player_killer, "assassination", Influence.INFLUENCES[1]);
             }
         }
@@ -107,7 +105,7 @@ public class Game {
                         canSteal = blockAndChallenge(player_thief, "steal", Influence.INFLUENCES[3], player_target);
                     }
                 }
-            } else if (choice.equals("2")){
+            } else {
                 canSteal = challengeCurrent(player_thief, "steal", Influence.INFLUENCES[2]);
             }
         }
@@ -261,13 +259,14 @@ public class Game {
 
     public boolean challengeCurrent(int player_i, String action, Influence influence){
         Player current = players[player_i];
-        String challenged = getInput("Challenging player number?");
+        String challenged = getInput(String.format("Enter your player number if you would like to challenge Player %1$s's %2$s?", player_i, action));
         if (!challenged.isEmpty()){
             int challengePlayer = StringToInt.convertToInt(challenged.substring(0,1));
             while (challengePlayer -1 == player_i || challengePlayer > players.length || challengePlayer < 1 || players[challengePlayer-1].isOut()){
                 challengePlayer = StringToInt.convertToInt("Invalid player number.");
             }
             Player challenger = players[challengePlayer-1];
+            String CHALLENGEREASON = ", you lost a challenge. Please choose an influence to lose.";
             if (influence.equals(current.getInfluence1())||influence.equals(current.getInfluence2())){
                 System.out.printf("%1$s had an %2$s. %3$s, you lose the challenge and an influence.%n",
                         current, influence, challenger);
