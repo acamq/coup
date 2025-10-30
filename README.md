@@ -13,7 +13,7 @@ This repository contains a self-contained implementation of the bluffing card ga
 
 - Java Development Kit (JDK) 8 or newer.
 
-## Building
+## Building (optional)
 
 Compile all sources from the project root:
 
@@ -22,6 +22,8 @@ javac *.java
 ```
 
 This produces the class files needed to run the game.
+
+You may also download a prebuilt .jar file from the releases.
 
 ## Running
 
